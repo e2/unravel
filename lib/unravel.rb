@@ -39,7 +39,7 @@ module Unravel
     end
 
     def add_fix(name, block)
-      fail HumanInterventionNeeded, "fix already exists: #{name}" if @fixes.key?(name)
+      fail HumanInterventionNeeded, "fix for root cause #{name} already exists" if @fixes.key?(name)
       @fixes[name] = block
     end
 
