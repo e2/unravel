@@ -92,8 +92,13 @@ module Unravel
 
     class FixableError < RuntimeError
       attr_reader :symptom
-      def initialize(symptom_name)
+      attr_reader :extracted_info
+      def initialize(symptom_name, extracted_info)
         @symptom = symptom_name
+
+        # TODO: clean this up
+        matchdata = extracted_info
+        @extracted_info = matchdata.captures.empty? ? [] : [matchdata]
       end
     end
 
@@ -190,7 +195,13 @@ module Unravel
         if name.is_a?(Hash)
           name, achievement = *name.first
         end
-        fix_for(name) { achieve achievement } unless block_given?
+        # TODO: this recursively calls self (just to provied block), though -
+        # is the block_given check needed?
+        unless block_given?
+          fix_for(name)  do |error|
+            achieve(achievement, *error.extracted_info)
+          end
+        end
       end
     end
 
@@ -235,8 +246,10 @@ module Unravel
       unless regexp
         fail HumanInterventionNeeded, "Unregistered error: #{name} to match #{error.inspect}"
       end
+
       # TODO: encoding not tested
-      fail FixableError.new(name) if regexp.match(error.force_encoding(Encoding::ASCII_8BIT))
+      match = regexp.match(error.force_encoding(Encoding::ASCII_8BIT))
+      fail FixableError.new(name, match) if match
     end
 
     def get_root_cause_for(symptom)
