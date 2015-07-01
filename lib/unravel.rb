@@ -32,6 +32,9 @@ module Unravel
       @errors = {}
     end
 
+    def has_fix_for?(cause)
+      @fixes.key?(cause)
+    end
 
     def get_fix_for(cause)
       achievement_or_block = @fixes[cause]
@@ -196,7 +199,9 @@ module Unravel
       root_cause_name = "no_#{fix_name}".to_sym
       error[error_name] = regexp
       root_cause_for error_name => root_cause_name
-      fix_for root_cause_name =>  fix_name
+      unless registry.has_fix_for?(root_cause_name)
+        fix_for root_cause_name => fix_name
+      end
       achievement fix_name, handlers, &method(fix_name)
     end
 
