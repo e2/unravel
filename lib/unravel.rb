@@ -77,7 +77,14 @@ module Unravel
   end
 
   class Session
+    class DefaultConfig
+      def max_retries
+        5
+      end
+    end
+
     attr_reader :registry
+    attr_reader :config
 
     class FixableError < RuntimeError
       attr_reader :symptom
@@ -86,14 +93,16 @@ module Unravel
       end
     end
 
-    def initialize
+    def initialize(config)
+      @config = config || DefaultConfig.new
       @registry = Registry.new
     end
 
-    def achieve(name, max_retries = 5)
+    def achieve(name)
       check # TODO: overhead?
 
       prev_causes = Set.new
+      max_retries = config.max_retries
       retries_left = max_retries
 
       begin
