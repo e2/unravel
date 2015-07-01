@@ -102,7 +102,7 @@ module Unravel
       @registry = Registry.new
     end
 
-    def achieve(name)
+    def achieve(name, *args)
       check # TODO: overhead?
 
       prev_causes = Set.new
@@ -122,7 +122,7 @@ module Unravel
         error_contexts = registry.error_contexts_for_achievement(name)
 
         begin
-          res = return_wrap(&block)
+          res = return_wrap(*args, &block)
         rescue *error_contexts.keys
           ex = $!
           econtext = error_contexts[ex.class]
@@ -207,8 +207,8 @@ module Unravel
 
     private
 
-    def return_wrap(&block)
-      Thread.new { return block.yield }.join
+    def return_wrap(*args, &block)
+      Thread.new { return block.yield(*args) }.join
     rescue LocalJumpError => ex
       ex.exit_value
     end
