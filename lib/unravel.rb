@@ -32,10 +32,11 @@ module Unravel
       @errors = {}
     end
 
-    def get_fix(name)
-      @fixes[name].tap do |cause|
-        fail HumanInterventionNeeded, "No fix for: #{name}" unless cause
-      end
+
+    def get_fix_for(cause)
+      achievement_or_block = @fixes[cause]
+      fail HumanInterventionNeeded, "No fix for: #{cause}" unless achievement_or_block
+      achievement_or_block
     end
 
     def add_fix(name, block)
@@ -151,7 +152,8 @@ module Unravel
         end
 
         prev_causes << cause
-        recipe_for(cause).call
+        fix = registry.get_fix_for(cause)
+        fix.call(error)
 
         retries_left -= 1
         retry if retries_left > 0
@@ -234,10 +236,6 @@ module Unravel
 
     def get_root_cause_for(symptom)
       registry.get_root_cause(symptom)
-    end
-
-    def recipe_for(name, &block)
-      registry.get_fix(name)
     end
   end
 end
