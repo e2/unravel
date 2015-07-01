@@ -109,6 +109,12 @@ module Unravel
         Unravel.logger.info("Achieving (attempt: #{max_retries - retries_left + 1}/#{max_retries}): #{name.inspect}")
 
         block = registry.get_achievement(name)
+        if block.arity >= 0
+          unless block.arity == args.size
+            fail ArgumentError, "expected #{block.arity} args for #{name.inspect}, got: #{args.inspect}"
+          end
+        end
+
         error_contexts = registry.error_contexts_for_achievement(name)
 
         begin
