@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.version = Unravel::VERSION
   spec.summary = "Solves complex non-deterministic problems given symptoms, causes and fixes"
   spec.description = 'Tool for solving non-deterministic problems given goals, symptoms, fixes and root causes'
-  spec.authors = 'Cezary Baginski <cezary@chronomantic.net>'
+  spec.authors = ['Cezary Baginski']
   spec.files = ['README.md', 'lib/unravel.rb', 'lib/unravel/exec.rb', 'lib/unravel/version.rb']
   spec.licenses = ['mit']
-  spec.email = 'cezary@chronomantic.net'
+  spec.email = ['cezary@chronomantic.net']
   spec.homepage = 'https://github.com/e2/unravel'
 end
