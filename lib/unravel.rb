@@ -237,7 +237,9 @@ module Unravel
     private
 
     def return_wrap(*args, &block)
-      Thread.new { return block.yield(*args) }.join
+      Thread.new do
+        return block.yield(*args)
+      end.join
     rescue LocalJumpError => ex
       ex.exit_value
     end
