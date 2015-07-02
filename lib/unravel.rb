@@ -98,6 +98,9 @@ module Unravel
       def max_retries
         5
       end
+
+      def after_achievement_success(name)
+      end
     end
 
     attr_reader :registry
@@ -156,7 +159,11 @@ module Unravel
           fail
         end
 
-        return true if res == true
+        if res == true
+          config.after_achievement_success(name)
+          return true
+        end
+
         fail NotImplementedError, "#{name} unexpectedly returned #{res.inspect} (expected true or exception)"
 
       rescue FixableError => error
