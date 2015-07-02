@@ -1,6 +1,34 @@
 module Unravel
   class Exec
-    class Error < Unravel::HumanInterventionNeeded; end
+    class Error < Unravel::HumanInterventionNeeded
+      class Standard < Error
+      end
+
+      class Silent < Error
+        attr_reader :exitcode
+        attr_reader :exitstatus
+        def initialize(exitcode, stdout)
+          @exitcode = exitcode
+          @stdout = stdout
+          super()
+        end
+
+        def to_s
+          message
+        end
+
+        def message
+          output =
+            if @stdout.lines.size > 1
+              indent = "\n  stdout"
+              "#{indent}: #{@stdout.lines * indent}\n"
+            else
+              "stdout: #{@stdout.inspect}"
+            end
+          "No stderr available: #{output} (exited with #{@exitcode})"
+        end
+      end
+    end
   end
 
   class << self
@@ -16,10 +44,12 @@ module Unravel
       return true if status.success?
       Unravel.logger.debug "Errors from #{args.inspect}: -----"
       Unravel.logger.debug "#{error}"
-      error = out if error.strip.empty?
-      raise Exec::Error, error
+
+      # TODO: is strip a good idea?
+      raise Exec::Error::Silent.new(status.exitstatus, out) if error.strip.empty?
+      raise Exec::Error::Standard, error
     rescue Errno::ENOENT => e
-      raise Exec::Error, e.message
+      raise Exec::Error::ENOENT, e.message
     end
 
     def Capture(args)
