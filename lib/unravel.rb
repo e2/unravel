@@ -168,11 +168,16 @@ module Unravel
         fail NoKnownRootCause, "Can't find root cause for: #{error.symptom}, #{error.message}" unless cause
 
         Unravel.logger.info("#{name}: Cause: #{cause.inspect}")
-        if prev_causes.include? cause
-          fail SameCauseReoccurringCause, "#{cause.to_s} wasn't ultimately fixed (it occured again)"
+
+        # Since causes can be generic (parametized), they're unique based on error matchers
+        unique_context = error.extracted_info
+        unique_cause = [cause, unique_context]
+
+        if prev_causes.include? unique_cause
+          fail SameCauseReoccurringCause, "#{cause.to_s} (with #{unique_context.inspect}) wasn't ultimately fixed (it occured again)"
         end
 
-        prev_causes << cause
+        prev_causes << unique_cause
         fix = registry.get_fix_for(cause)
         fix.call(error)
 
