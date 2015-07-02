@@ -21,6 +21,19 @@ module Unravel
   class NoKnownRootCause < HumanInterventionNeeded ; end
   class SameCauseReoccurringCause < HumanInterventionNeeded; end
 
+  class NoErrorHandler
+    attr_reader :name
+    attr_reader :exception
+    def initialize(name, ex)
+      @name = name
+      @exception = ex
+    end
+
+    def message
+      "Achievement #{name.inspect} is not declared to handle exceptions of type: #{ex.class}"
+    end
+  end
+
   class Registry
     attr_reader :achievements, :symptoms, :fixes, :contexts, :errors
 
@@ -133,7 +146,7 @@ module Unravel
           econtext = error_contexts[ex.class]
           unless econtext
             # TODO: not tested
-            fail "No error context given for #{name} to handle exception: #{ex.message}"
+            fail NoErrorHandler.new(name, ex)
           end
 
           econtext.each do |fix_name|
