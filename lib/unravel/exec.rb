@@ -18,10 +18,11 @@ module Unravel
         end
 
         def message
+          lines = @stdout.lines.to_a
           output =
-            if @stdout.lines.size > 1
+            if lines.size > 1
               indent = "\n  stdout"
-              "#{indent}: #{@stdout.lines * indent}\n"
+              "#{indent}: #{lines * indent}\n"
             else
               "stdout: #{@stdout.inspect}"
             end
