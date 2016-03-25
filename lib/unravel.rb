@@ -118,8 +118,8 @@ module Unravel
       end
     end
 
-    def initialize(config)
-      @config = config || DefaultConfig.new
+    def initialize(config = DefaultConfig.new)
+      @config = config
       @registry = Registry.new
     end
 
