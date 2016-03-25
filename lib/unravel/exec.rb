@@ -60,9 +60,9 @@ module Unravel
       Unravel.logger.debug "Errors from #{args.inspect}: -----"
       Unravel.logger.debug "#{error}"
       error = out if error.strip.empty?
-      raise Exec::Error, error
+      raise Exec::Error::Standard, error
     rescue Errno::ENOENT => e
-      raise Exec::Error, e.message
+      raise Exec::Error::ENOENT, e.message
     end
   end
 end
